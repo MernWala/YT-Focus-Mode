@@ -1,113 +1,129 @@
-import Image from "next/image";
+"use client";
+import { useEffect, useRef, useState } from 'react'
+import { IoIosLink } from "react-icons/io";
+import { LuPaintbrush } from "react-icons/lu";
+import { FaYoutube } from "react-icons/fa";
+import { GoStack, GoTrash } from "react-icons/go";
 
-export default function Home() {
+const Home = () => {
+
+  const textarea = useRef("")
+  const mainForm = useRef("")
+  const [currentLink, setCurrentLink] = useState('')
+  const [inputState, setInputState] = useState({})
+  const [linkStacks, setLinkStacks] = useState(() => { return JSON.parse(localStorage.getItem('youtube-jugad')) || [] })
+
+  const handleInsert = (url) => {
+    if (url) {
+      setCurrentLink(url)
+      return;
+    }
+
+    const regex = /src="(.*?)"/;
+    const match = regex.exec(inputState?.url);
+    if (match) {
+      const src = match[1];
+      setCurrentLink(src)
+      return;
+    }
+
+    if (currentLink.length === 0) {
+      window.alert(`Can't handle link!`)
+      mainForm.current.reset()
+    }
+  }
+
+  const handleStack = () => {
+    const regex = /src="(.*?)"/;
+    const match = regex.exec(inputState?.url)
+    if (match) {
+      const src = match[1];
+      setLinkStacks([{ ...inputState, url: src }, ...linkStacks])
+    }
+  }
+
+  const handleDelete = (url) => {
+    setLinkStacks(linkStacks.filter(ele => ele.url != url))
+  }
+
+  useEffect(() => {
+    localStorage.setItem('youtube-jugad', JSON.stringify(linkStacks))
+  }, [linkStacks])
+
   return (
-    <main className="flex min-h-screen flex-col items-center justify-between p-24">
-      <div className="z-10 max-w-5xl w-full items-center justify-between font-mono text-sm lg:flex">
-        <p className="fixed left-0 top-0 flex w-full justify-center border-b border-gray-300 bg-gradient-to-b from-zinc-200 pb-6 pt-8 backdrop-blur-2xl dark:border-neutral-800 dark:bg-zinc-800/30 dark:from-inherit lg:static lg:w-auto  lg:rounded-xl lg:border lg:bg-gray-200 lg:p-4 lg:dark:bg-zinc-800/30">
-          Get started by editing&nbsp;
-          <code className="font-mono font-bold">app/page.js</code>
-        </p>
-        <div className="fixed bottom-0 left-0 flex h-48 w-full items-end justify-center bg-gradient-to-t from-white via-white dark:from-black dark:via-black lg:static lg:h-auto lg:w-auto lg:bg-none">
-          <a
-            className="pointer-events-none flex place-items-center gap-2 p-8 lg:pointer-events-auto lg:p-0"
-            href="https://vercel.com?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            By{" "}
-            <Image
-              src="/vercel.svg"
-              alt="Vercel Logo"
-              className="dark:invert"
-              width={100}
-              height={24}
-              priority
-            />
-          </a>
+    <main className="flex min-h-[100vh] bg-gray-900 pt-28 pb-4">
+      <div className="w-8/12 p-4">
+        {/* dangerously inserted element goes here */}
+        <div className="h-full w-full flex items-start justify-center relative">
+          <iframe className="w-[95%] rounded-xl aspect-video bg-gray-700" src={currentLink} title="YouTube video player" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowFullScreen>          </iframe>
+          {currentLink.length === 0 &&
+            <div className='absolute w-full h-full flex items-center justify-center'>
+              <span className='text-lg text-gray-300 capitalize font-light my-auto'>Your video will show here</span>
+            </div>
+          }
         </div>
       </div>
-
-      <div className="relative flex place-items-center before:absolute before:h-[300px] before:w-full sm:before:w-[480px] before:-translate-x-1/2 before:rounded-full before:bg-gradient-radial before:from-white before:to-transparent before:blur-2xl before:content-[''] after:absolute after:-z-20 after:h-[180px] after:w-full sm:after:w-[240px] after:translate-x-1/3 after:bg-gradient-conic after:from-sky-200 after:via-blue-200 after:blur-2xl after:content-[''] before:dark:bg-gradient-to-br before:dark:from-transparent before:dark:to-blue-700 before:dark:opacity-10 after:dark:from-sky-900 after:dark:via-[#0141ff] after:dark:opacity-40 before:lg:h-[360px] z-[-1]">
-        <Image
-          className="relative dark:drop-shadow-[0_0_0.3rem_#ffffff70] dark:invert"
-          src="/next.svg"
-          alt="Next.js Logo"
-          width={180}
-          height={37}
-          priority
-        />
+      <div className="w-4/12 p-4">
+        <form ref={mainForm}>
+          <input
+            type="text"
+            name='title'
+            className="w-full bg-gray-600 text-white rounded-md p-2 focus:outline-none focus:shadow-md focus:border-gray-400 font-mono text-sm mb-2"
+            placeholder='Set Title for below link'
+            onChange={(e) => { setInputState({ ...inputState, [e.target.name]: e.target.value }) }}
+          />
+          <textarea
+            rows="7"
+            name='url'
+            className="w-full bg-gray-600 text-white rounded-md p-2 focus:outline-none focus:shadow-md focus:border-gray-400 font-mono text-sm"
+            placeholder="Insert embaded link of youtube!"
+            onChange={(e) => { setInputState({ ...inputState, [e.target.name]: e.target.value }) }}
+            ref={textarea}
+          >
+          </textarea>
+        </form>
+        <div className="mt-2">
+          <span className="block text-lg font-semibold text-white mb-2">Input Action</span>
+          <div className="flex gap-3">
+            <button type="button" className="border-0 bg-green-800 lh-1 leading-none px-3 py-2 rounded-md text-white uppercase flex gap-1" onClick={() => { handleInsert("") }}>
+              <IoIosLink />
+              Insert
+            </button>
+            <button type="button" className="border-0 bg-red-600 lh-1 leading-none px-3 py-2 rounded-md text-white uppercase flex gap-1" onClick={() => { mainForm.current.reset(); }}>
+              <LuPaintbrush />
+              Clear
+            </button>
+            <button type="button" className="border-0 bg-blue-600 lh-1 leading-none px-3 py-2 rounded-md text-white uppercase flex gap-1" onClick={() => { handleStack() }}>
+              <GoStack />
+              Stack Links
+            </button>
+          </div>
+          <div className='mt-4 flex flex-col gap-2'>
+            {linkStacks.map((ele) => {
+              return (
+                <div className='bg-gray-600 p-1 rounded-full flex items-center justify-start' key={ele.url}>
+                  <div className='bg-gray-500 p-1 rounded-[50%] hover:scale-125 cursor-pointer transition-all hover:transition-all'>
+                    <div className='relative flex items-center justify-center' onClick={() => { handleInsert(ele.url); console.log(ele.url) }}>
+                      <p className='m-0 bg-white w-[10px] h-[10px] absolute z-0'></p>
+                      <FaYoutube className='text-red-600 text-2xl relative z-1' />
+                    </div>
+                  </div>
+                  <div className='ms-2 w-[85%]'>
+                    <span className='text-sm text-white font-light capitalize truncate overflow-hidden block w-full cursor-default'>{ele.title}</span>
+                  </div>
+                  <div className='width-fit block ms-auto px-1 pe-0'>
+                    <button type="button" className='leading-0 bg-red-600 p-2 rounded-full' onClick={() => { handleDelete(ele.url) }}>
+                      <GoTrash className='leading-0 text-white' />
+                    </button>
+                  </div>
+                </div>
+              )
+            })}
+          </div>
+        </div>
       </div>
-
-      <div className="mb-32 grid text-center lg:max-w-5xl lg:w-full lg:mb-0 lg:grid-cols-4 lg:text-left">
-        <a
-          href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-          className="group rounded-lg border border-transparent px-5 py-4 transition-colors hover:border-gray-300 hover:bg-gray-100 hover:dark:border-neutral-700 hover:dark:bg-neutral-800/30"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <h2 className={`mb-3 text-2xl font-semibold`}>
-            Docs{" "}
-            <span className="inline-block transition-transform group-hover:translate-x-1 motion-reduce:transform-none">
-              -&gt;
-            </span>
-          </h2>
-          <p className={`m-0 max-w-[30ch] text-sm opacity-50`}>
-            Find in-depth information about Next.js features and API.
-          </p>
-        </a>
-
-        <a
-          href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          className="group rounded-lg border border-transparent px-5 py-4 transition-colors hover:border-gray-300 hover:bg-gray-100 hover:dark:border-neutral-700 hover:dark:bg-neutral-800 hover:dark:bg-opacity-30"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <h2 className={`mb-3 text-2xl font-semibold`}>
-            Learn{" "}
-            <span className="inline-block transition-transform group-hover:translate-x-1 motion-reduce:transform-none">
-              -&gt;
-            </span>
-          </h2>
-          <p className={`m-0 max-w-[30ch] text-sm opacity-50`}>
-            Learn about Next.js in an interactive course with&nbsp;quizzes!
-          </p>
-        </a>
-
-        <a
-          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-          className="group rounded-lg border border-transparent px-5 py-4 transition-colors hover:border-gray-300 hover:bg-gray-100 hover:dark:border-neutral-700 hover:dark:bg-neutral-800/30"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <h2 className={`mb-3 text-2xl font-semibold`}>
-            Templates{" "}
-            <span className="inline-block transition-transform group-hover:translate-x-1 motion-reduce:transform-none">
-              -&gt;
-            </span>
-          </h2>
-          <p className={`m-0 max-w-[30ch] text-sm opacity-50`}>
-            Explore starter templates for Next.js.
-          </p>
-        </a>
-
-        <a
-          href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-          className="group rounded-lg border border-transparent px-5 py-4 transition-colors hover:border-gray-300 hover:bg-gray-100 hover:dark:border-neutral-700 hover:dark:bg-neutral-800/30"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <h2 className={`mb-3 text-2xl font-semibold`}>
-            Deploy{" "}
-            <span className="inline-block transition-transform group-hover:translate-x-1 motion-reduce:transform-none">
-              -&gt;
-            </span>
-          </h2>
-          <p className={`m-0 max-w-[30ch] text-sm opacity-50 text-balance`}>
-            Instantly deploy your Next.js site to a shareable URL with Vercel.
-          </p>
-        </a>
-      </div>
-    </main>
-  );
+    </main >
+  )
 }
+
+export default Home
