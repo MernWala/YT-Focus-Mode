@@ -51,7 +51,7 @@ const Home = () => {
   }, [linkStacks])
 
   return (
-    <main className="flex min-h-[100vh] bg-gray-900 pt-28 pb-4">
+    <main className="flex min-h-[100vh] bg-gray-900 pt-20 pb-4">
       <div className="w-8/12 p-4">
         {/* dangerously inserted element goes here */}
         <div className="h-full w-full flex items-start justify-center relative">
