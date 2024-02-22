@@ -11,7 +11,13 @@ const Home = () => {
   const mainForm = useRef("")
   const [currentLink, setCurrentLink] = useState('')
   const [inputState, setInputState] = useState({})
-  const [linkStacks, setLinkStacks] = useState(() => { return JSON.parse(localStorage.getItem('youtube-jugad')) || [] })
+  const [linkStacks, setLinkStacks] = useState(() => {
+    if (window !== 'undefined') {
+      return JSON.parse(localStorage.getItem('youtube-jugad')) || []
+    }
+    
+    return []
+  })
 
   const handleInsert = (url) => {
     if (url) {
@@ -46,6 +52,12 @@ const Home = () => {
     setLinkStacks(linkStacks.filter(ele => ele.url != url))
   }
 
+  const handleSubmit = (e) => {
+    e.preventDefault()
+    handleInsert("")
+    handleStack()
+  }
+
   useEffect(() => {
     localStorage.setItem('youtube-jugad', JSON.stringify(linkStacks))
   }, [linkStacks])
@@ -53,9 +65,8 @@ const Home = () => {
   return (
     <main className="flex min-h-[100vh] bg-gray-900 pt-20 pb-4">
       <div className="w-8/12 p-4">
-        {/* dangerously inserted element goes here */}
         <div className="h-full w-full flex items-start justify-center relative">
-          <iframe className="w-[95%] rounded-xl aspect-video bg-gray-700" src={currentLink} title="YouTube video player" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowFullScreen>          </iframe>
+          <iframe className="w-[95%] rounded-xl aspect-video bg-gray-700" src={currentLink} title="YouTube video player" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowFullScreen></iframe>
           {currentLink.length === 0 &&
             <div className='absolute w-full h-full flex items-center justify-center'>
               <span className='text-lg text-gray-300 capitalize font-light my-auto'>Your video will show here</span>
@@ -64,7 +75,7 @@ const Home = () => {
         </div>
       </div>
       <div className="w-4/12 p-4">
-        <form ref={mainForm}>
+        <form ref={mainForm} onSubmit={handleSubmit}>
           <input
             type="text"
             name='title'
@@ -122,7 +133,7 @@ const Home = () => {
           </div>
         </div>
       </div>
-    </main >
+    </main>
   )
 }
 
