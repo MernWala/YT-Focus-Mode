@@ -63,8 +63,8 @@ const Home = () => {
   }, [linkStacks])
 
   return (
-    <main className="flex min-h-[100vh] bg-gray-900 pt-20 pb-4">
-      <div className="w-8/12 p-4">
+    <main className="flex flex-wrap min-h-[100vh] bg-gray-900 pt-20 pb-4 relative z-0">
+      <div className="lg:w-8/12 sm:w-full w-full lg:p-4 p-0">
         <div className="h-full w-full flex items-start justify-center relative">
           <iframe className="w-[95%] rounded-xl aspect-video bg-gray-700" src={currentLink} title="YouTube video player" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowFullScreen></iframe>
           {currentLink.length === 0 &&
@@ -74,7 +74,7 @@ const Home = () => {
           }
         </div>
       </div>
-      <div className="w-4/12 p-4">
+      <div className="lg:w-4/12 sm:w-full w-full p-4">
         <form ref={mainForm} onSubmit={handleSubmit}>
           <input
             type="text"

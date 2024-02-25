@@ -15,7 +15,7 @@ export default function RootLayout({ children }) {
       <body className={inter.className}>
 
         {/* Navbar goes here */}
-        <div className="bg-gray-500 w-full px-3 drop-shadow-2xl fixed top-0">
+        <div className="bg-gray-500 w-full px-3 drop-shadow-2xl fixed z-[2]">
           
           <div className="flex gap-1 items-center">
             <div className='relative flex items-center justify-center'>
